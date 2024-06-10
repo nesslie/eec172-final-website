@@ -423,10 +423,10 @@ grow.
     <td><p>Digikey</p></td>
     <td><p>Used for low-pass filter in IR circuit</p></td>
   <tr>
-    <td colspan="3">
+    <td colspan="2">
       <p>TOTAL PARTS</p></td>
     <td><p>6</p></td>
-    <td colspan="2">
+    <td colspan="1">
       <p>TOTAL</p></td>
     <td><p>$160.99</p></td>
     <td></td>
