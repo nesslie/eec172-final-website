@@ -56,72 +56,25 @@ Our source code can be found
 <!-- EDIT METADATA ABOVE FOR CONTENTS TO APPEAR ABOVE THE TABLE OF CONTENTS -->
 <!-- ALL CONTENT THAT FOLLWOWS WILL APPEAR IN AND AFTER THE TABLE OF CONTENTS -->
 
-# Market Survey
-
-There are two types of similar product on the market. The first one is
-products from AeroGarden. Their products allow users to grow plants in
-nutrient solutions in a limited amount of usually 5 to 10. Compared with
-this product, our product provides an automated system for nutrient
-control that ensures the plant always has the correct amount of
-nutrients needed to avoid excess or insufficient nutrients. The other
-product is an expensive commercial system for horticulture aiming for a
-large scale of growth. Compared with this one, our product has the
-advantage of being cheap and small-scale which is more suitable for
-individual hobbyists to explore hydroponics.
-
-<div style="display:flex;flex-wrap:wrap;justify-content:space-evenly;">
-  <div style='display: inline-block; vertical-align: top;'>
-    <img src="./media/Image_003.jpg" style="width:auto;height:200"/>
-    <span class="caption">
-      <a href="https://aerogarden.com/gardens/harvest-family/Harvest-2.0.html">AeroGarden Harvest 2.0</a>
-      <ul style="text-align:left;">
-      <li>Inexpensive ($90)</li>
-      <li>Not Automated</li>
-      <li>Small Scale</li>
-      <li>No remote monitoring</li>
-    </ul>
-    </span>
-  </div>
-  <div style='display: inline-block; vertical-align: top;'>
-    <img src="./media/Image_004.jpg" style="width:auto;height:200" />
-    <span class="caption">
-      <a href="https://www.hydroexperts.com.au/Autogrow-MultiGrow-Controller-All-In-One-Controller-8-Growing-Zones">Autogrow Multigrow</a>
-      <ul style="text-align:left;">
-      <li>Expensive ($4500)</li>
-      <li>Fully Automated</li>
-      <li>Huge Scale</li>
-      <li>Cloud monitoring</li>
-    </ul>
-    </span>
-  </div>
-</div>
-
 # Design
 
 ## System Architecture
 
 <div style="display:flex;flex-wrap:wrap;justify-content:space-evenly;">
   <div style="display:inline-block;vertical-align:top;flex:1 0 400px;">
-    As shown in the system flowchart, we use one of the CC3200 boards for
-    the closed feedback loop for maintaining concentration in the
-    environment. The board will read values with I2C protocol through an ADC
-    which reads values from the thermistor and the TDS meter sensor. The
-    board will also periodically read user-defined thresholds from the AWS
-    cloud using RESTful APIs. When the sensory values read outside of the
-    user-defined thresholds, the board will activate the motor control
-    function to pump either water or nutrient solution to bring the
-    concentration back within the thresholds. Meanwhile, another CC3200
-    board is frequently reading from the AWS cloud to present the current
-    TDS reading and user-defined threshold to the user on an OLED through
-    SPI protocols. To adjust the thresholds, the user can either do it
-    remotely or locally by using a TV remote to type the number into the IR
-    receiver. The adjustments will be updated to the AWS and if the user
-    updates remotely, the local CC3200 board will update the values in the
-    next synchronization.
+    The farthest point from the CC3200 Launchpad is the IR Remote, which simply
+    sends its signals through the air. These signals are picked up and converted
+    to pulses by the onboard TSOP 311 Receiver, which is connected to the
+    CC3200 Launchpad. The onboard switches are also connected to the CC3200
+    Launchpad. Our micocontroller will have the responsibility of decoding the
+    input from the IR Receiver and switches to determine internal state. Based
+    on this internal state, actions to control the OLED Display and send messages
+    to AWS IoT are executed. In the case of the Stocks app, a conditional wait
+    to obtain a state back from AWS IoT is executed. 
   </div>
   <div style="display:inline-block;vertical-align:top;flex:0 0 400px;">
     <div class="fig">
-      <img src="./media/Image_005.jpg" style="width:90%;height:auto;" />
+      <img src="./media/SystemArchectireu.png" style="width:90%;height:auto;" />
       <span class="caption">System Flowchart</span>
     </div>
   </div>
@@ -131,201 +84,70 @@ individual hobbyists to explore hydroponics.
 
 <div style="display:flex;flex-wrap:wrap;justify-content:space-evenly;">
   <div style="display:inline-block;vertical-align:top;flex:1 0 300px;">
-    Our system works based on the following state diagram. The device will
-    periodically monitor the temperature and the electrical conductivity
-    (EC) of the solution and convert the values into a TDS value using a
-    calibration curve. At the same time, the device will check for threshold
-    inputs, both over the AWS shadow and via manual input on the IR
-    receiver. It will compare the TDS with the lower and upper thresholds
-    set by the user. If the value is within the thresholds, it will stay in
-    the rest state. If the TDS is higher than the upper thresholds, it will
-    go to the water state and activate the water pump until the PPM is lower
-    than the upper thresholds and go back to the rest state. If the PPM is
-    lower than the lower thresholds, it will go to the nutrient state and
-    activate the nutrient pump until the PPM is higher than the lower
-    thresholds and go back to the rest state. In each state, the device will
-    periodically post the TDS.
+  Our entry point for the user begins when they turn on the device, where after
+  some wait for initialization the home screen will render. From there, the
+  cursor will update depending on the values read by the onboard accelerate
+  of the device. Our user interacts with the device by manipulating switches
+  which act as touch inputs. Depending on the state of these switches, the
+  application changes state, which will propagate to a home screen change. When
+  text input is required, the user will interact with the remote which will
+  update the onboard buffer of storage asynchronously. The application 
+  then becomes a consumer of the data, where it can conditionally retrieve it
+  depending on the current app screen. This will then be sent to AWS, where
+  AWS IoT routes messages to either a Lambda Service or SNS. AWS will then
+  update the device shadow depending on the data sent, where the launchpad can
+  again consume and display it, achieving the functionality required for the
+  Stocks and Messaging apps.
   </div>
   <div style="display:inline-block;vertical-align:top;flex:0 0 500px">
     <div class="fig">
-      <img src="./media/Image_006.jpg" style="width:90%;height:auto;" />
+      <img src="./media/functional.png" style="width:90%;height:auto;" />
       <span class="caption">State Diagram</span>
     </div>
   </div>
 </div>
 
 # Implementation
+## Micocontroller Logic
+Although our original architecture was slightly more complex, our eventual
+implementation ended up being much simpler than initially expected. The basic
+idea is that on the refresh of the display, all interfaces are polled and
+application-specific behavior is determined and validated. By building on top
+of the OLED commands implemented from Lab 2, we could cut down on development
+time and create functions which could be called to draw the app screen
+depending on the state of of device at the time. This makes switching between
+screens intuitive from a developer's perspective, and we can re-use the same
+state variables to conditionally send data to AWS IoT. 
 
-### CC3200-LAUNCHXL Evaluation Board
+Control of the state variables is determined by the current status of the
+cursor and the state of both of the switches onboard the CC3200 Launchpad. If
+the user's cursor is over an app icon / region of interest when either switch
+is activated, this will register as a button press. Attached to these button 
+presses are the changes to the state variables which will get picked up on the
+next refresh of the screen. This is the idea behind the asynchronous updates
+to the IR Receiver buffer since the main loop can simply read from the buffer
+when the state is correct, such as when in the stock app. The message is
+then conditionally formatted to the app state and sent to AWS where in the case
+of the stock app, it will wait for the Lambda Function to finish execution
+and display the data once the Shadow State is updated.
 
-All control and logic was handled by two CC3200 microcontroller units,
-one each for the Master and Slave device. On the master device, it was
-responsible for decoding IR inputs from the remote to allow the user to
-input thresholds to be sent over AWS. The board’s SPI functionality,
-using the TI SPI library, was used to interface with the OLED display.
-The MCU is WiFi enabled, allowing a remote connection between the two
-boards.
-
-On the slave device, the microcontroller was responsible for the same
-functionalities as above, in addition to the TDS reading and control.
-This includes interfacing with the ADC over the I2C bus, reading 
-thresholds over HTTP from the AWS device shadow, writing the reported 
-TDS to the device shadow, and activating the two pumps using the 
-BJT control circuit.
-
-## Functional Blocks: Master
-
-### AWS IoT Core
-
-<div style="display:flex;flex-wrap:wrap;justify-content:space-between;">
-  <div style='display: inline-block; vertical-align: top;flex:1 0 200px'>
-    The AWS IoT core allows our devices to communicate with each other
-    asynchronously. The master device can update the desired thresholds, and
-    the slave device will read them and synchronize them to the reported
-    state. The slave device will also post the TDS and temperature readings
-    periodically.
-  </div>
-  <div style='display: inline-block; vertical-align: top;flex:0 0 400px'>
-    <div class="fig">
-      <img src="./media/Image_007.jpg" style="width:auto;height:2.5in" />
-      <span class="caption">Device Shadow JSON</span>
-    </div>
-  </div>
-</div>
-
-### OLED Display
-
-<div style="display:flex;flex-wrap:wrap;justify-content:space-between;">
-  <div style='display: inline-block; vertical-align: top;flex:1 0 400px'>
-    On both Master and Slave devices, the user can view the current TDS and
-    temperature of the plant solution on an OLED display. The user can also
-    use the display to view and edit the TDS thresholds. The CC3200 uses the
-    SPI bus to communicate with the display module.
-  </div>
-  <div style='display: inline-block; vertical-align: top;flex:0 0 400px'>
-    <div class="fig">
-      <img src="./media/Image_008.jpg" style="width:auto;height:2in" />
-      <span class="caption">OLED Wiring Diagram</span>
-    </div>
-  </div>
-</div>
-
-### IR Receiver
-
-<div style="display:flex;flex-wrap:wrap;justify-content:space-between;">
-  <div style='display: inline-block; vertical-align: top;flex:1 0 400px'>
-    On both the Master and Slave devices, a user can input the TDS
-    thresholds using a TV remote. These TV remotes use the NEC code format
-    with a carrier frequency of 38KHz. The Vishay IR receiver is connected
-    to Pin 62 of the CC3200, which is configured as a GPIO input pin. Each
-    positive edge of the signal triggers an interrupt in the main program,
-    storing the pulse distances into a buffer, and allowing us to decode the
-    inputs (1-9, delete and enter). The IR receiver is connected to VCC
-    through a resistor and a capacitor to filter any ripples.
-  </div>
-  <div style='display: inline-block; vertical-align: top;flex:0 0 400px'>
-    <div class="fig">
-      <img src="./media/Image_009.jpg" style="width:auto;height:2in" />
-      <span class="caption">IR Receiver Wiring Diagram</span>
-    </div>
-  </div>
-</div>
-
-## Functional Blocks: Slave
-
-The slave device contains all the functional blocks from the master
-device, plus the following:
-
-### Analog-To-Digital Converter (ADC) Board
-
-<div style="display:flex;flex-wrap:wrap;justify-content:space-between;">
-  <div style='display: inline-block; vertical-align: top;flex:1 0 400px'>
-    The outputs from the thermistor and TDS sensor board are
-    in the form of analog voltages, which need to be converted to digital
-    values to be usable in our program. We chose the AD1015 breakout board
-    from Adafruit, which sports 4-channels and 12 bits of precision. We
-    ended up using only 2 channels, so there is a potential for even more
-    cost savings. The ADC board supports I2C communication, which we can use
-    to request and read the two channel voltages. 
-    The <a href="https://cdn-shop.adafruit.com/datasheets/ads1015.pdf">
-    product datasheet</a> contains the necessary configuration values
-    and register addresses for operation.
-  </div>
-  <div style='display: inline-block; vertical-align: top;flex:1 0 400px'>
-    <div class="fig">
-      <img src="./media/Image_010.jpg" style="width:auto;height:2in" />
-      <span class="caption">ADC Wiring Diagram</span>
-    </div>
-  </div>
-</div>
-
-### Thermistor
-
-<div style="display:flex;flex-wrap:wrap;justify-content:space-between;">
-  <div style='display: inline-block; vertical-align: top;flex:1 0 300px;'>
-    Conductivity-based TDS measurements are sensitive to temperature. To
-    allow accurate TDS measurements in a variety of climates and seasons,
-    temperature compensation calculations must be performed. To measure the
-    temperature, we use an NTC thermistor connected in a voltage divider
-    with a 10k resistor. The voltage across the resistor is read by the ADC
-    and converted to temperature using the equation provided by the
-    thermistor datasheet.
-  </div>
-  <div style='display: inline-block; vertical-align: top;flex:1 0 400px'>
-    <div class="fig">
-      <img src="./media/Image_011.jpg" style="width:auto;height:2in" />
-      <span class="caption">Thermistor Circuit Diagram</span>
-    </div>
-  </div>
-</div>
-
-### TDS Sensor Board
-
-<div style="display:flex;flex-wrap:wrap;justify-content:space-between;">
-  <div style='display: inline-block; vertical-align: top;flex:1 0 500px'>
-    In our first attempt to measure TDS, we used a simple two-probe analog
-    setup with a voltage divider. We soon found out that this was a naïve
-    approach (see Challenges). Consequently, we acquired a specialty TDS
-    sensing board from CQRobot, which generates a sinusoidal pulse and
-    measures the voltage drop to give a highly precise voltage to the ADC.
-    The MCU can then convert this voltage to a TDS value using the equation
-    provided by the device datasheet. We calibrated the TDS readings using a
-    standalone TDS sensor pen. After calibration and setting up the curves
-    for temperature compensation, we were able to achieve TDS readings
-    accurate to within 5% of the TDS sensor pen.
-  </div>
-  <div style='display: inline-block; vertical-align: top;flex:1 0 600px'>
-    <div class="fig">
-      <img src="./media/Image_012.jpg" style="width:auto;height:2in;padding-top:30px" />
-      <span class="caption">TDS Sensor Wiring Diagram</span>
-    </div>
-  </div>
-</div>
-
-### Pumps and Control Circuit
-
-<div style="display:flex;flex-wrap:wrap;justify-content:space-between;">
-  <div style='display: inline-block; vertical-align: top;flex:1 0 500px'>
-    The CC3200 is unable to provide sufficient power to drive the pumps,
-    which need 100mA of current each. Therefore, we used an external power
-    source in the form of 2 AA batteries for each pump motor. To allow the
-    CC3200 to turn on/off the motors, we designed a simple amplifier using a
-    Common Emitter topology. When the control pin is asserted HIGH, the BJT
-    will allow current to flow from 3V to ground through the pump motor.
-    Conversely, if the control signal is LOW, the BJT will not allow current
-    to flow in the motor. For each motor, there is a reverse-biased diode
-    connected across it. This protects our circuit from current generated by
-    the motor if it is spun from external force or inertia.
-  </div>
-  <div style='display: inline-block; vertical-align: top;flex:1 0 600px'>
-    <div class="fig">
-      <img src="./media/Image_013.jpg" style="width:auto;height:2in;padding-top:30px" />
-      <span class="caption">Pump Circuit Diagrams</span>
-    </div>
-  </div>
-</div>
+## AWS Implementation
+On the AWS Side, AWS IoT is used to handle all communication from the
+Launchpad to the rest of the internet. To implement the functionality in the
+Stocks app, an AWS Lambda function is used to access the API Ninjas Stock API.
+Due to the way the \verb|g_app_config| struct is set up, our Launchpad had no
+clear way to connect to multiple servers at the same time, so using AWS IoT
+with routing allows us to bypass this limitation. Our application uses the
+way AWS IoT can conditionally trigger by only reading the variables that were
+changed since the last shadow topic. This allows our messaging service and our
+stock query service to trigger independently of each other, rather than every
+time a change to the state is made. Essentially its a makeshift version of API
+Gateway.
 
 # Challenges
+
+## Touchscreen Interface Was Far More Difficult Than Expected
+One major challenge was that we tried to implement a new touch screen device (HiLetgo ILI9341 2.8" SPI TFT LCD Display Touch Panel) instead of the OLED display for easier and better user interface experience as it comes with a built-in tap sensor. Because it uses a different driver chip, ILI9341, while the OLED uses SSD1351, we could not directly use the given Adafruit\_SSD1351.h file. However, the main issue stemmed from the fact that these Adafruit driver chip header files are written in C++ with the intent of using them with Arduinos. So, the header files needed to be manually ported from C++ to C, so that the CC3200 LaunchPad will be able to compile and run these external files successfully. As the device uses SPI communication like the OLED, we were able to set up the connections and port the necessary functions, such as the initialization sequence, by referencing the Adafruit\_SSD1351.h file and using the same writeCommand() and writeData() functions. However, the challenge came from testing this communication as the Adafruit\_GFX files are used universally in conjunction with the Adafruit driver chip header files. But because this also comes in C++ with Arduino-specific language, these files needed to be customized for the touch screen device as well. Although the given Adafruit\_GFX files were already given in C, there are commands specific to the OLED's SSD1351 driver chip that are not directly transferable to the ILI9341 driver chip. Although we tried to translate and replace those specific commands, the graphic functions would not show on the device, making it unable to determine where specifically the problem stems from. Initializing and implementing a new device takes time and if we had more time, we may have been able to set it up and use it instead.
 
 ## AWS Struggles
 One of the biggest obstacles to achieving our original vision is the way
@@ -358,11 +180,9 @@ tier. So unfortunately after a while of trying to make it work, we had to
 scrap the idea.
 # Future Work
 
-Given more time, we had the idea of developing a web app to allow users
-to control the device from their cell phone. Another idea we wanted to
-implement in the future is adding a grow light and pH controller to
-maintain a more suitable and stable environment for different plants to
-grow.
+Some additional features we can add include implementing a vertical or horizontal scroll to realistically mimic a smart device, adding a music player app through music streaming APIs such as Spotify, and enhancing user interface by smoothing the app screen transitions and cursor control. Another feature we could add is a two-way communication between two LaunchPads so that they send and receive messages on the Messaging app through AWS IoT.
+Finally, we could simplify memory usage by switching to an MQTT protocol
+for two-way communication between the board and AWS IoT.
 
 
 # Finalized BOM
