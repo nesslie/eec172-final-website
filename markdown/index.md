@@ -382,7 +382,6 @@ grow.
 </thead>
 <tbody>
   <tr>
-    <td><p>1</p></td>
     <td><p>CC3200-LAUNCHXL</p></td>
     <td><p>1</p></td>
     <td><p>$66.00</p></td>
