@@ -429,7 +429,6 @@ grow.
     <td colspan="2">
       <p>TOTAL</p></td>
     <td><p>$160.99</p></td>
-    <td></td>
   </tr>
 </tbody>
 </table>
