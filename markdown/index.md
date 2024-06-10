@@ -426,7 +426,7 @@ grow.
     <td colspan="1">
       <p>TOTAL PARTS</p></td>
     <td><p>6</p></td>
-    <td colspan="1">
+    <td colspan="2">
       <p>TOTAL</p></td>
     <td><p>$160.99</p></td>
     <td></td>
