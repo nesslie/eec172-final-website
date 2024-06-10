@@ -1,6 +1,6 @@
 ---
 title: 'TiltPod No Touch'
-author: '**Kushagra Tiwari and Shengmin Liu** (website template by Ryan Tsang)'
+author: '**Brian Barcenas and Emily Hoang** (website template by Ryan Tsang)'
 date: '*EEC172 SQ24*'
 
 subtitle: '<blockquote><b>EEC172 Final Project Webpage Example</b><br/>
@@ -12,18 +12,21 @@ assignment.<br/>The website source is hosted
 
 toc-title: 'Table of Contents'
 abstract-title: '<h2>Description</h2>'
-abstract: 'Hydroponics is a technique where plants are grown in a nutrient-rich
-solution. This soil- free technique has been gaining traction recently
-due to its ability to optimize resource utilization. However, since
-plants are highly sensitive to changes in TDS, hydroponic setups require
-continuous TDS monitoring and adjustment. NutriSense, our device, allows
-hobbyists to achieve ideal hydroponics results on a small scale. It
-continuously monitors TDS and temperature, allowing the user to remotely
-read the status over AWS IoT cloud. The user can remotely enter upper
-and lower thresholds for TDS, and the device will automatically add
-nutrient solution or water to keep the TDS bounded by the thresholds.
-The device can also be configured to send notifications over SNS when
-the TDS value goes outside thresholds.
+abstract: 'TiltPod No Touch is a smart device that enables users to access custom apps
+, similarly to a smart phone. User interface involves controlling the cursor 
+through the BMA222''s accelerometer and clicking on the apps via the LaunchPad''s 
+switches. SW2 enables the user to click on apps and interact with its features 
+if any, while SW3 allows them to return to the home screen at any given time.
+The cursor is shown on the color OLED display, and is updated in real-time as 
+the user moves the cursor. Two apps we implemented were a Stocks app and 
+Messaging app, where the user can search a company''s stock value to potentially
+purchase it, and send a message resembling a text. These texts in both apps are 
+typed using a TV IR remote, which are sent to AWS IoT Cloud through the HTTP 
+POST method. The Stocks app uses a Lambda function to retrieve data about the 
+company''s stocks and returns its ticker, name, price, and exchange when
+requested through the HTTP GET method. We process this information and 
+display the ticker, price, and exchange on the OLED screen. Then, a button
+will appear prompting the user to purchase it if desired.
 <br/><br/>
 Our source code can be found 
 <!-- replace this link -->
@@ -44,7 +47,7 @@ Our source code can be found
 <h2>Video Demo</h2>
 <div style="text-align:center;margin:auto;max-width:560px">
   <div style="padding-bottom:56.25%;position:relative;height:0;">
-    <iframe style="left:0;top:0;width:100%;height:100%;position:absolute;" width="560" height="315" src="https://youtu.be/KxDK-oURCSk" title="YouTube video player" frameborder="0" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    <iframe style="left:0;top:0;width:100%;height:100%;position:absolute;" width="560" height="315" src="https://www.youtube.com/embed/wSRtnAEZhmc?si=3vQXNj4h0WkW-F-q" title="YouTube video player" frameborder="0" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
   </div>
 </div>
 '
@@ -324,42 +327,35 @@ device, plus the following:
 
 # Challenges
 
-The most significant challenge we faced while developing this prototype
-was of inaccurate and inconsistent Electrical Conductivity (EC)
-measurements. This occurred due to two reasons: probe channel
-polarization and current limitations of GPIO pins.
+## AWS Struggles
+One of the biggest obstacles to achieving our original vision is the way
+request and network requests work with the Launchpad. Since our Launchpad
+lacks to the credentials to interface with webservers the way a browser
+or an API testing service like Postman do, we were extremely limited with
+how to build scalable web services. Our original vision was to use AWS API
+Gateway since its routing and automatic integration would be perfect
+for quickly adding webapp configurations and functionality. However after
+configuring a RESTFul API, deploying it and making the appropriate changes
+to the Launchpad Code, our micro controller just couldn't seem to connect. It
+was most likely a permissions issue, but there wasn't a clear way to attach
+API Gateway access to our certificates, so we ended up pivoting to using 
+AWS IoT Rules instead.
 
-## Probe Channel Polarization
+## TI SDK Documentation out of sync
+Another surprising struggle was serializing JSON responses on the Launchpad.
+There was a well documented example on TI's reference online, but it turns out
+that the implementation on the documentation, and the implementation included 
+in the SDK were completely different from each other, leading to much
+confusion and trying different lightweight C JSON libraries. Eventually we
+realized that the parser was not consuming the response as we expected it, but
+it took a very long time to reach that point, and therefore we ran out of time
+to add other apps.
 
-Our first design for the probe was simply two copper rods, which would
-add as electrodes. This probe would be connected in series with a
-1000-ohm resistor to act as a voltage divider. We would simply connect
-the probe to VCC and measure the voltage divider through the ADC,
-allowing us to calculate the EC. However, when we used the probe for a
-few minutes, we realized that the EC value would continue to rise. This
-is because the DC current causes an ionized channel to build up between
-the two electrodes in the water. This cause inconsistent EC readings as
-time goes on.
-
-## Current Limitation of GPIO Pins
-
-Our next idea was to try using the GPIO pins to power the probe, since
-we can turn it off when not needed, preventing excessive polarization.
-However, the GPIO pins are current limited, and any control circuit with
-a transistor would introduce extra voltage drops. Therefore, the simple
-two-probe implementation was not feasible.
-
-## Solution to Challenges
-
-We realized that using DC current to measure EC was not feasible.
-Therefore, we purchased a standalone EC measurement board from CQRobot.
-This inexpensive solution (\$8) used a low-voltage, low-current AC
-signal to prevent polarization. The board would convert the AC voltage
-drop across the solution to a DC analog voltage, which would then be
-read by our ADC. After calibrating the setup using a commercial TDS pen,
-the results were accurate within 3%, and would not drift by more than
-0.5% over time.
-
+## Paid API Access
+And finally, API access to the Twitter has been slashed in recent years, with
+no clear messages on what's a paid feature and what's supported on the free
+tier. So unfortunately after a while of trying to make it work, we had to
+scrap the idea.
 # Future Work
 
 Given more time, we had the idea of developing a web app to allow users

@@ -4,8 +4,8 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <meta name="author" content="Kushagra Tiwari and Shengmin Liu (website template by Ryan Tsang)" />
-  <title>NutriSense: Automated Hydroponics Dosing System</title>
+  <meta name="author" content="Brian Barcenas and Emily Hoang (website template by Ryan Tsang)" />
+  <title>TiltPod No Touch</title>
   <!-- <link rel="stylesheet" type="text/css" href="assets/github-markdown-light.css" /> -->
   <link rel="stylesheet" href="assets/github-markdown-light.css" />
   <link rel="stylesheet" href="assets/style-customization.css" />
@@ -15,30 +15,34 @@
 </head>
 <article class="markdown-body">
 <header id="title-block-header">
-<h1 class="title">NutriSense: Automated Hydroponics Dosing System</h1>
+<h1 class="title">TiltPod No Touch</h1>
 <p class="subtitle"><blockquote><b>EEC172 Final Project Webpage Example</b><br/> Note to current students: this is an <i>example</i> webpage and may not fulfill all stated requirements of the current quarter's assignment.<br/>The website source is hosted <a href="https://github.com/ucd-eec172/project-website-example">on github</a>. </blockquote></p>
-<p class="author"><strong>Kushagra Tiwari and Shengmin Liu</strong>
+<p class="author"><strong>Brian Barcenas and Emily Hoang</strong>
 (website template by Ryan Tsang)</p>
-<p class="date"><em>EEC172 WQ24</em></p>
+<p class="date"><em>EEC172 SQ24</em></p>
 <div class="abstract">
 <div class="abstract-title"><h2>Description</h2></div>
-Hydroponics is a technique where plants are grown in a nutrient-rich
-solution. This soil- free technique has been gaining traction recently
-due to its ability to optimize resource utilization. However, since
-plants are highly sensitive to changes in TDS, hydroponic setups require
-continuous TDS monitoring and adjustment. NutriSense, our device, allows
-hobbyists to achieve ideal hydroponics results on a small scale. It
-continuously monitors TDS and temperature, allowing the user to remotely
-read the status over AWS IoT cloud. The user can remotely enter upper
-and lower thresholds for TDS, and the device will automatically add
-nutrient solution or water to keep the TDS bounded by the thresholds.
-The device can also be configured to send notifications over SNS when
-the TDS value goes outside thresholds. <br/><br/> Our source code can be
-found <!-- replace this link -->
+TiltPod No Touch is a smart device that enables users to access custom
+apps , similarly to a smart phone. User interface involves controlling
+the cursor through the BMA222's accelerometer and clicking on the apps
+via the LaunchPad's switches. SW2 enables the user to click on apps and
+interact with its features if any, while SW3 allows them to return to
+the home screen at any given time. The cursor is shown on the color OLED
+display, and is updated in real-time as the user moves the cursor. Two
+apps we implemented were a Stocks app and Messaging app, where the user
+can search a company's stock value to potentially purchase it, and send
+a message resembling a text. These texts in both apps are typed using a
+TV IR remote, which are sent to AWS IoT Cloud through the HTTP POST
+method. The Stocks app uses a Lambda function to retrieve data about the
+company's stocks and returns its ticker, name, price, and exchange when
+requested through the HTTP GET method. We process this information and
+display the ticker, price, and exchange on the OLED screen. Then, a
+button will appear prompting the user to purchase it if desired.
+<br/><br/> Our source code can be found <!-- replace this link -->
 <a href="https://github.com/ucd-eec172/project-website-example"> here
 (placeholder)</a>.<br />
 <div style="display:flex;flex-wrap:wrap;justify-content:space-evenly;padding-top:20px"> <div style="display: inline-block; vertical-align: bottom;"> <img src="./media/Image_001.jpg" style="width:auto;height:2in"/> <!-- <span class="caption"> </span> --> </div> <div style="display: inline-block; vertical-align: bottom;"> <img src="./media/Image_002.jpg" style="width:auto;height:2in" /> <!-- <span class="caption"> </span> --> </div> </div>
-<h2>Video Demo</h2> <div style="text-align:center;margin:auto;max-width:560px"> <div style="padding-bottom:56.25%;position:relative;height:0;"> <iframe style="left:0;top:0;width:100%;height:100%;position:absolute;" width="560" height="315" src="https://youtu.be/KxDK-oURCSk" title="YouTube video player" frameborder="0" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe> </div> </div> 
+<h2>Video Demo</h2> <div style="text-align:center;margin:auto;max-width:560px"> <div style="padding-bottom:56.25%;position:relative;height:0;"> <iframe style="left:0;top:0;width:100%;height:100%;position:absolute;" width="560" height="315" src="https://www.youtube.com/embed/wSRtnAEZhmc?si=3vQXNj4h0WkW-F-q" title="YouTube video player" frameborder="0" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe> </div> </div> 
 </div>
 </header>
 <nav id="TOC" role="doc-toc">
@@ -80,13 +84,13 @@ id="toc-pumps-and-control-circuit">Pumps and Control Circuit</a></li>
 </ul></li>
 <li><a href="#challenges" id="toc-challenges">Challenges</a>
 <ul>
-<li><a href="#probe-channel-polarization"
-id="toc-probe-channel-polarization">Probe Channel Polarization</a></li>
-<li><a href="#current-limitation-of-gpio-pins"
-id="toc-current-limitation-of-gpio-pins">Current Limitation of GPIO
-Pins</a></li>
-<li><a href="#solution-to-challenges"
-id="toc-solution-to-challenges">Solution to Challenges</a></li>
+<li><a href="#aws-struggles" id="toc-aws-struggles">AWS
+Struggles</a></li>
+<li><a href="#ti-sdk-documentation-out-of-sync"
+id="toc-ti-sdk-documentation-out-of-sync">TI SDK Documentation out of
+sync</a></li>
+<li><a href="#paid-api-access" id="toc-paid-api-access">Paid API
+Access</a></li>
 </ul></li>
 <li><a href="#future-work" id="toc-future-work">Future Work</a></li>
 <li><a href="#finalized-bom" id="toc-finalized-bom">Finalized
@@ -350,36 +354,35 @@ Converter (ADC) Board</h3>
 </div>
 
 <h1 id="challenges">Challenges</h1>
-<p>The most significant challenge we faced while developing this
-prototype was of inaccurate and inconsistent Electrical Conductivity
-(EC) measurements. This occurred due to two reasons: probe channel
-polarization and current limitations of GPIO pins.</p>
-<h2 id="probe-channel-polarization">Probe Channel Polarization</h2>
-<p>Our first design for the probe was simply two copper rods, which
-would add as electrodes. This probe would be connected in series with a
-1000-ohm resistor to act as a voltage divider. We would simply connect
-the probe to VCC and measure the voltage divider through the ADC,
-allowing us to calculate the EC. However, when we used the probe for a
-few minutes, we realized that the EC value would continue to rise. This
-is because the DC current causes an ionized channel to build up between
-the two electrodes in the water. This cause inconsistent EC readings as
-time goes on.</p>
-<h2 id="current-limitation-of-gpio-pins">Current Limitation of GPIO
-Pins</h2>
-<p>Our next idea was to try using the GPIO pins to power the probe,
-since we can turn it off when not needed, preventing excessive
-polarization. However, the GPIO pins are current limited, and any
-control circuit with a transistor would introduce extra voltage drops.
-Therefore, the simple two-probe implementation was not feasible.</p>
-<h2 id="solution-to-challenges">Solution to Challenges</h2>
-<p>We realized that using DC current to measure EC was not feasible.
-Therefore, we purchased a standalone EC measurement board from CQRobot.
-This inexpensive solution ($8) used a low-voltage, low-current AC signal
-to prevent polarization. The board would convert the AC voltage drop
-across the solution to a DC analog voltage, which would then be read by
-our ADC. After calibrating the setup using a commercial TDS pen, the
-results were accurate within 3%, and would not drift by more than 0.5%
-over time.</p>
+<h2 id="aws-struggles">AWS Struggles</h2>
+<p>One of the biggest obstacles to achieving our original vision is the
+way request and network requests work with the Launchpad. Since our
+Launchpad lacks to the credentials to interface with webservers the way
+a browser or an API testing service like Postman do, we were extremely
+limited with how to build scalable web services. Our original vision was
+to use AWS API Gateway since its routing and automatic integration would
+be perfect for quickly adding webapp configurations and functionality.
+However after configuring a RESTFul API, deploying it and making the
+appropriate changes to the Launchpad Code, our micro controller just
+couldn't seem to connect. It was most likely a permissions issue, but
+there wasn't a clear way to attach API Gateway access to our
+certificates, so we ended up pivoting to using AWS IoT Rules
+instead.</p>
+<h2 id="ti-sdk-documentation-out-of-sync">TI SDK Documentation out of
+sync</h2>
+<p>Another surprising struggle was serializing JSON responses on the
+Launchpad. There was a well documented example on TI's reference online,
+but it turns out that the implementation on the documentation, and the
+implementation included in the SDK were completely different from each
+other, leading to much confusion and trying different lightweight C JSON
+libraries. Eventually we realized that the parser was not consuming the
+response as we expected it, but it took a very long time to reach that
+point, and therefore we ran out of time to add other apps.</p>
+<h2 id="paid-api-access">Paid API Access</h2>
+<p>And finally, API access to the Twitter has been slashed in recent
+years, with no clear messages on what's a paid feature and what's
+supported on the free tier. So unfortunately after a while of trying to
+make it work, we had to scrap the idea.</p>
 <h1 id="future-work">Future Work</h1>
 <p>Given more time, we had the idea of developing a web app to allow
 users to control the device from their cell phone. Another idea we
