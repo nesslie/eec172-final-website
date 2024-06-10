@@ -7,7 +7,7 @@ subtitle: '<blockquote><b>EEC172 Final Project Webpage Example</b><br/>
 Note to current students: this is an <i>example</i> webpage and
 may not fulfill all stated requirements of the current quarter''s 
 assignment.<br/>The website source is hosted 
-<a href="https://github.com/ucd-eec172/project-website-example">on github</a>.
+<a href="https://github.com/nesslie/eec172-final-website/tree/main/code">on github</a>.
 </blockquote>'
 
 toc-title: 'Table of Contents'
@@ -30,20 +30,8 @@ will appear prompting the user to purchase it if desired.
 <br/><br/>
 Our source code can be found 
 <!-- replace this link -->
-<a href="https://github.com/ucd-eec172/project-website-example">
-  here (placeholder)</a>.
-
-<div style="display:flex;flex-wrap:wrap;justify-content:space-evenly;padding-top:20px">
-  <div style="display: inline-block; vertical-align: bottom;">
-    <img src="./media/Image_001.jpg" style="width:auto;height:2in"/>
-    <!-- <span class="caption"> </span> -->
-  </div>
-  <div style="display: inline-block; vertical-align: bottom;">
-    <img src="./media/Image_002.jpg" style="width:auto;height:2in" />
-    <!-- <span class="caption"> </span> -->
-  </div>
-</div>
-
+<a href="https://github.com/nesslie/eec172-final-website/tree/main/code">
+  here </a>.
 <h2>Video Demo</h2>
 <div style="text-align:center;margin:auto;max-width:560px">
   <div style="padding-bottom:56.25%;position:relative;height:0;">
