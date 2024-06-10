@@ -3,12 +3,6 @@ title: 'TiltPod No Touch'
 author: '**Brian Barcenas and Emily Hoang** (website template by Ryan Tsang)'
 date: '*EEC172 SQ24*'
 
-subtitle: '<blockquote><b>EEC172 Final Project Webpage Example</b><br/>
-Note to current students: this is an <i>example</i> webpage and
-may not fulfill all stated requirements of the current quarter''s 
-assignment.<br/>The website source is hosted 
-<a href="https://github.com/nesslie/eec172-final-website/tree/main/code">on github</a>.
-</blockquote>'
 
 toc-title: 'Table of Contents'
 abstract-title: '<h2>Description</h2>'
