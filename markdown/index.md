@@ -1,7 +1,7 @@
 ---
-title: 'NutriSense: Automated Hydroponics Dosing System'
+title: 'TiltPod No Touch'
 author: '**Kushagra Tiwari and Shengmin Liu** (website template by Ryan Tsang)'
-date: '*EEC172 WQ24*'
+date: '*EEC172 SQ24*'
 
 subtitle: '<blockquote><b>EEC172 Final Project Webpage Example</b><br/>
 Note to current students: this is an <i>example</i> webpage and
